@@ -1,59 +1,91 @@
-// lib/screen/home.dart
 import 'package:flutter/material.dart';
+import '../models/shirt_item.dart';
+import '../data/mock_data.dart';
+import 'insert.dart';
+import 'detail.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<ShirtItem> shirts = List.from(mockShirts);
+
+  void _addNewShirt(ShirtItem newShirt) {
+    setState(() {
+      shirts.add(newShirt);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            onPressed: () {},
-            child: const Text(
-              "Click",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            'CET STORE 184',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.black,
             ),
           ),
-          const SizedBox(height: 10),
-
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.green),
-            onPressed: () {},
-            child: const Text(
-              "Click",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.blueGrey, width: 3),
-              backgroundColor: Colors.yellowAccent,
-              foregroundColor: Colors.blueGrey,
-            ),
-            onPressed: () {},
-            child: const Text(
-              "Click",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-            onPressed: () {},
-            child: const Text(
-              "Click",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
+        ),
+        backgroundColor: Colors.orange[200],
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
+      body: ListView.builder(
+        itemCount: shirts.length,
+        itemBuilder: (context, index) {
+          final shirt = shirts[index];
+          return Card(
+            margin: const EdgeInsets.all(8),
+            child: ListTile(
+              leading: Image.asset(
+                'assets/shirts/${shirt.imageName}',
+                width: 60,
+                fit: BoxFit.cover,
+              ),
+              title: Text('${shirt.brand} - ${shirt.type.name}'),
+              subtitle: Text(
+                'Size: ${shirt.size.name.toUpperCase()}, Chest: ${shirt.chestSize}"\n'
+                'Price: \$${shirt.price.toStringAsFixed(2)} - ${shirt.storeName}',
+              ),
+              trailing: Image.asset(
+                'assets/logos/${shirt.logo}',
+                width: 40,
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DetailPage(shirt: shirt),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orange,
+        onPressed: () async {
+          final newShirt = await Navigator.push<ShirtItem>(
+            context,
+            MaterialPageRoute(builder: (_) => const InsertPage()),
+          );
+          if (newShirt != null) {
+            _addNewShirt(newShirt);
+          }
+        },
+        child: const Icon(Icons.add),
+      ),
+      backgroundColor: Colors.white,
     );
   }
 }
